@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catalog Posts</title>
+</head>
+<body>
+    <h1>Catalog Posts</h1>
+    <ul>
+        {% for post in posts %}
+            <li><a href="{% url 'blog:post_detail' post.slug %}">{{ post.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Main Page</title>
+</head>
+<body>
+<h1>Главная страница</h1>
+<ul>
+  <li><a href="{% url 'blog:catalog_categories' %}">Каталог категорий</a></li>
+  <li><a href="{% url 'blog:catalog_posts' %}">Каталог постов</a></li>
+  <li><a href="{% url 'blog:catalog_tags' %}">Каталог тегов</a></li>
+</ul>
+</body>
+</html>

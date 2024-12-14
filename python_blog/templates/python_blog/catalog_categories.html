@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catalog Categories</title>
+</head>
+<body>
+    <h1>Catalog Categories</h1>
+    <ul>
+        {% for category in categories %}
+            <li><a href="{% url 'blog:category_detail' category.slug %}">{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
