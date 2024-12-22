@@ -163,7 +163,7 @@ def main(request):
     context = {
         "menu_items": MENU_ITEMS,
     }
-    return render(request, 'python_blog/main.html', {"menu_items": MENU_ITEMS})
+    return render(request, 'main.html', {"menu_items": MENU_ITEMS})
 
 
 def catalog_posts(request):
