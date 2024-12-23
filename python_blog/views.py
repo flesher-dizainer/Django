@@ -22,9 +22,10 @@ TAGS = [
 ]
 MENU_ITEMS = [
     {"title": "Главная", "url_name": "main"},
-    {"title": "Все посты", "url_name": "blog:catalog_posts"},
+    {"title": "Блог", "url_name": "blog:blog"},
     {"title": "Категории", "url_name": "blog:catalog_categories"},
     {"title": "Теги", "url_name": "blog:catalog_tags"},
+    {"title": "About", "url_name": "about"},
 ]
 dataset = [
     {
@@ -166,9 +167,17 @@ def main(request):
     return render(request, 'main.html', {"menu_items": MENU_ITEMS})
 
 
+def about(request):
+    context = {}
+    return render(request, 'about.html', context)
+
+
 def catalog_posts(request):
-    posts = POSTS
-    return render(request, 'python_blog/catalog_posts.html', {'posts': posts})
+    context = {
+        'blog_items': dataset,
+        "menu_items": MENU_ITEMS,
+    }
+    return render(request, 'python_blog/blog.html', context)
 
 
 def catalog_categories(request):

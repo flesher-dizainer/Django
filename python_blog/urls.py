@@ -18,7 +18,7 @@ from django.urls import path
 from python_blog.views import *
 app_name = 'blog'  # Добавляем неймспейс
 urlpatterns = [
-    path('', catalog_posts, name='catalog_posts'),
+    path('', catalog_posts, name='blog'),
     path('categories/', catalog_categories, name='catalog_categories'),
     path('categories/<slug:category_slug>/', category_detail, name='category_detail'),
     path('tags/', catalog_tags, name='catalog_tags'),
