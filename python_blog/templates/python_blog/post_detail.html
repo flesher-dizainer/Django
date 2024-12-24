@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Post Detail</title>
-</head>
-<body>
-    <h1>Детальная информация о Post</h1>
-    <p>Post: {{ post_slug }}</p>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block content %}
+<div>
+  <h1>{{ item.title }}</h1>
+  <p>{{ item.post }}</p>
+
+
+  <!-- Блок комментариев -->
+  <div class="comment-section">
+    <h3>Комментарии</h3>
+    {% for comment in item.comments %}
+      <div class="comment">
+        <p><strong>{{ comment.username }}</strong></p>
+        <p>{{ comment.text }}</p>
+      </div>
+    {% endfor %}
+  
+  <!-- Блок дополнительной информации -->
+  <div class="post-info">
+    <p>Опубликовано: {{ item.is_published }}</p>
+    <p>Просмотров: {{ item.views }}</p>
+    <p>Лайков: {{ item.likes }}</p>
+  </div>
+</div>
+{% endblock %}
+</div>

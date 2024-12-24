@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block content %}{% include 'python_blog/post_preview_include.html' %}{% endblock %}
+{% block content %}
+<div>
+{% for item in blog_items %}
+    {% include "python_blog/post_preview_include.html" %}
+{% endfor %}
+</div>
+{% endblock %}

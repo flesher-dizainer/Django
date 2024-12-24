@@ -38,7 +38,7 @@ def about(request):
 
 
 def catalog_posts(request):
-    return render(request, 'python_blog/blog.html')
+    return render(request, 'python_blog/blog.html', {"blog_items" :dataset})
 
 
 def catalog_categories(request):
@@ -56,6 +56,14 @@ def catalog_tags(request):
 def tag_detail(request, tag_slug):
     return render(request, 'python_blog/tag_detail.html', {'tag_slug': tag_slug})
 
+def get_post_by_slug(post_slug):
+    for item in dataset:
+        if item['slug'] == post_slug:
+            return item
 
 def post_detail(request, post_slug):
-    return render(request, 'python_blog/post_detail.html', {'post_slug': post_slug})
+    item = get_post_by_slug(post_slug)
+    context = {
+        'item': item,
+    }
+    return render(request, 'python_blog/post_detail.html', context)

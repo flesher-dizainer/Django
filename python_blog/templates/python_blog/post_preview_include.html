@@ -1,7 +1,19 @@
-<ul>
-    {% for item in blog_items %}
-    <li>
-        <a href="">{{ item.title}}</a>
-    </li>
-    {% endfor %}
-</ul>
+<!-- Внешний div-блок, который будет содержать всю информацию -->
+<div class="blog-info-block">
+
+  <!-- div-блок для названия блога -->
+  <div class="blog-title">
+    <h1>{{ item.title }}</h1>
+  </div>
+
+  <!-- div-блок для краткого содержания -->
+  <div class="blog-summary">
+    <p>{{ item.post }}</p>
+  </div>
+
+  <!-- div-блок для ссылки на детальное содержание блога -->
+  <div class="blog-link">
+    <a href="{{ item.slug }}">Перейти к полной записи блога</a>
+  </div>
+
+</div>
