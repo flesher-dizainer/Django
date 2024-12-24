@@ -22,3 +22,12 @@ nav ul li {
     border-radius: 4px;
     text-decoration: none;
 }
+.category_main_card{
+	display: flex;
+    flex-direction: column;
+	gap: 10px;
+    border: darkcyan;
+}
+.category_card{
+	border:1px;
+}

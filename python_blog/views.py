@@ -20,13 +20,7 @@ TAGS = [
     {'slug': 'Div', 'name': 'Div'},
 
 ]
-MENU_ITEMS = [
-    {"title": "Главная", "url_name": "main"},
-    {"title": "Блог", "url_name": "blog:blog"},
-    {"title": "Категории", "url_name": "blog:catalog_categories"},
-    {"title": "Теги", "url_name": "blog:catalog_tags"},
-    {"title": "About", "url_name": "about"},
-]
+
 dataset = [
     {
         "title": "Что нового в Python 3.10?",
@@ -161,10 +155,8 @@ dataset = [
 
 
 def main(request):
-    context = {
-        "menu_items": MENU_ITEMS,
-    }
-    return render(request, 'main.html', {"menu_items": MENU_ITEMS})
+
+    return render(request, 'main.html' )
 
 
 def about(request):
@@ -173,16 +165,12 @@ def about(request):
 
 
 def catalog_posts(request):
-    context = {
-        'blog_items': dataset,
-        "menu_items": MENU_ITEMS,
-    }
-    return render(request, 'python_blog/blog.html', context)
+    return render(request, 'python_blog/blog.html')
 
 
 def catalog_categories(request):
     categories = CATEGORIES  # Список категорий
-    return render(request, 'python_blog/catalog_categories.html', {'categories': categories})
+    return render(request, 'python_blog/catalog_categories.html', {'categories': CATEGORIES})
 
 
 def category_detail(request, category_slug):
