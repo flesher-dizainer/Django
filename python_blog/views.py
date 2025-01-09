@@ -1,7 +1,9 @@
 from lib2to3.fixes.fix_input import context
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from python_blog.blog_data import dataset
+from .models import Post
+
 # from django.http import HttpResponse
 
 CATEGORIES = [
@@ -38,7 +40,8 @@ def about(request):
 
 
 def catalog_posts(request):
-    return render(request, 'python_blog/blog.html', {"blog_items" :dataset})
+    posts = Post.objects.all()
+    return render(request, 'python_blog/blog.html', {"blog_items" :posts})
 
 
 def catalog_categories(request):
@@ -61,9 +64,6 @@ def get_post_by_slug(post_slug):
         if item['slug'] == post_slug:
             return item
 
-def post_detail(request, post_slug):
-    item = get_post_by_slug(post_slug)
-    context = {
-        'item': item,
-    }
-    return render(request, 'python_blog/post_detail.html', context)
+def post_detail(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    return render(request, 'python_blog/post_detail.html', {'item': post})
