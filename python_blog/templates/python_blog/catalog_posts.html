@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Catalog Posts</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Каталог постов{% endblock %}
+
+{% block content %}
     <h1>Catalog Posts</h1>
     <ul>
         {% for post in posts %}
-            <li><a href="{% url 'blog:post_detail' post.slug %}">{{ post.name }}</a></li>
+            <li><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></li>
         {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}

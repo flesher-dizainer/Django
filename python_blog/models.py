@@ -40,7 +40,7 @@ class Post(models.Model):
             self.slug = slugify(unidecode(self.title))
         super(Post, self).save(*args, **kwargs)
 
-    def str(self):
+    def __str__(self):
         return self.title
 
     def get_absolute_url(self):
