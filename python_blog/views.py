@@ -1,69 +1,44 @@
-from lib2to3.fixes.fix_input import context
-
 from django.shortcuts import render, get_object_or_404
-from python_blog.blog_data import dataset
-from .models import Post
-
-# from django.http import HttpResponse
-
-CATEGORIES = [
-    {'slug': 'python', 'name': 'Python'},
-    {'slug': 'django', 'name': 'Django'},
-    {'slug': 'postgresql', 'name': 'PostgreSQL'},
-    {'slug': 'docker', 'name': 'Docker'},
-    {'slug': 'linux', 'name': 'Linux'},
-]
-POSTS = [
-    {'slug': 'blog', 'name': 'Blog'},
-    {'slug': 'home', 'name': 'Home'},
-    {'slug': 'about', 'name': 'About'},
-    {'slug': 'contact', 'name': 'Contact'},
-    {'slug': 'privacy', 'name': 'Privacy'},
-]
-TAGS = [
-    {'slug': 'Div', 'name': 'Div'},
-
-]
+from .models import Post, Category, Tag
 
 
 def main(request):
-
-    return render(request, 'main.html' )
+    return render(request, 'main.html')
 
 
 def about(request):
     context = {
         "title": "О нас",
-        "text":"Страница с информацией о нас",
+        "text": "Страница с информацией о нас",
     }
     return render(request, 'about.html', context)
 
 
 def catalog_posts(request):
     posts = Post.objects.all()
-    return render(request, 'python_blog/blog.html', {"blog_items" :posts})
+    return render(request, 'python_blog/blog.html', {"posts": posts})
 
 
 def catalog_categories(request):
-    return render(request, 'python_blog/catalog_categories.html', {'categories': CATEGORIES})
-
-
-def category_detail(request, category_slug):
-    return render(request, 'python_blog/category_detail.html', {'category_slug': category_slug})
+    categories = Category.objects.all()
+    return render(request, 'python_blog/catalog_categories.html', {'categories': categories})
 
 
 def catalog_tags(request):
-    return render(request, 'python_blog/catalog_tags.html', {'tags': TAGS})
+    tags = Tag.objects.all()
+    return render(request, 'python_blog/catalog_tags.html', {'tags': tags})
+
+
+def category_detail(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    return render(request, 'python_blog/category_detail.html', {'category': category})
 
 
 def tag_detail(request, tag_slug):
-    return render(request, 'python_blog/tag_detail.html', {'tag_slug': tag_slug})
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    return render(request, 'python_blog/tag_detail.html', {'tag': tag})
 
-def get_post_by_slug(post_slug):
-    for item in dataset:
-        if item['slug'] == post_slug:
-            return item
 
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
-    return render(request, 'python_blog/post_detail.html', {'item': post})
+    return render(request, 'python_blog/post_detail.html', {'post': post})
