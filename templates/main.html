@@ -1,13 +1,26 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Главная страница{% endblock %}
+{% block title %}Главная{% endblock %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-12">
-      <h1 class="mb-4">Главная страница</h1>
-      <p class="lead">Добро пожаловать на главную страницу нашего сайта!</p>
+<div class="hero-section text-center py-5 mb-5">
+    <h1 class="display-4 mb-4">Добро пожаловать в блог</h1>
+    <p class="lead mb-4">Открывайте новые идеи и делитесь своими мыслями</p>
+    <a href="{% url 'blog:blog' %}" class="btn btn-primary custom-btn">
+        Читать статьи <i class="fas fa-arrow-right ms-2"></i>
+    </a>
+</div>
+
+<div class="features-section row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 post-card">
+            <div class="card-body text-center">
+                <i class="fas fa-newspaper fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Свежие статьи</h5>
+                <p class="card-text">Читайте последние публикации наших авторов</p>
+            </div>
+        </div>
     </div>
-  </div>
+    <!-- Добавьте другие карточки возможностей -->
+</div>
 {% endblock %}
