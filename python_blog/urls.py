@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.urls import path
 from .views import *
+
 app_name = 'blog'  # Добавляем неймспейс
 urlpatterns = [
     path('', catalog_posts, name='blog'),

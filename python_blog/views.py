@@ -42,3 +42,4 @@ def tag_detail(request, tag_slug):
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
     return render(request, 'python_blog/post_detail.html', {'post': post})
+
