@@ -1,14 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Catalog Tags</title>
-</head>
-<body>
-    <h1>Catalog Tags</h1>
-    <ul>
+{% extends 'base.html' %}
+
+{% block title %}Теги{% endblock %}
+
+{% block content %}
+<div class="tags-container">
+    <h1 class="text-center mb-4">Теги блога</h1>
+    <div class="row">
         {% for tag in tags %}
-            <li><a href="{% url 'blog:tag_detail' tag.slug %}">{{ tag.name }}</a></li>
+            <div class="col-md-3 mb-3">
+                <div class="tag-card">
+                    <h4>{{ tag.name }}</h4>
+                    <p class="posts-count">Постов: {{ tag.posts_count }}</p>
+                    <a href="{{ tag.get_absolute_url }}" class="btn btn-outline-primary">
+                        Смотреть посты
+                    </a>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}

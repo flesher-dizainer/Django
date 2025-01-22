@@ -1,19 +1,28 @@
-<!-- Внешний div-блок, который будет содержать всю информацию -->
-<div class="blog-info-block">
+<div class="post-card">
+    <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text">{{ post.text|truncatewords:30 }}</p>
+        
+        <div class="post-meta">
+            {% if post.category %}
+                <a href="{{ post.category.get_absolute_url }}" class="category-badge">
+                    {{ post.category.name }}
+                </a>
+            {% endif %}
+            
+            {% for tag in post.tags.all %}
+                <a href="{{ tag.get_absolute_url }}" class="tag-badge">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </div>
 
-  <!-- div-блок для названия блога -->
-  <div class="blog-title">
-    <h1>{{ item.title }}</h1>
-  </div>
-
-  <!-- div-блок для краткого содержания -->
-  <div class="blog-summary">
-    <p>{{ item.post }}</p>
-  </div>
-
-  <!-- div-блок для ссылки на детальное содержание блога -->
-  <div class="blog-link">
-    <a href="{{ item.slug }}">Перейти к полной записи блога</a>
-  </div>
-
+        <div class="post-footer">
+            <div class="stats">
+                <span><i class="fas fa-eye"></i> {{ post.views }}</span>
+                <span><i class="fas fa-calendar"></i> {{ post.published_date|date:"d.m.Y" }}</span>
+            </div>
+            <a href="{{ post.get_absolute_url }}" class="btn btn-primary">Читать</a>
+        </div>
+    </div>
 </div>

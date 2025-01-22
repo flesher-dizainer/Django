@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'python_blog',
     'django_extensions',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -47,8 +48,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+]
+# Настройки Debug Toolbar
+INTERNAL_IPS = [
+    '127.0.0.1',
 ]
 
+# Настройки пагинации
+POSTS_PER_PAGE = 10
 ROOT_URLCONF = 'blog.urls'
 
 TEMPLATES = [

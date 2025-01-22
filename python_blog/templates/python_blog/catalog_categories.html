@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Catalog Categories{% endblock %}
+
+{% block title %}Категории{% endblock %}
+
 {% block content %}
-    <div class="category_main_card">
+<div class="categories-container">
+    <h1 class="text-center mb-4">Категории блога</h1>
+    <div class="row">
         {% for category in categories %}
-         {% include 'python_blog/category_include.html' %}
+            <div class="col-md-4 mb-4">
+                <div class="category-card">
+                    <h3>{{ category.name }}</h3>
+                    <p class="posts-count">Постов: {{ category.posts_count }}</p>
+                    <a href="{{ category.get_absolute_url }}" class="btn btn-primary">
+                        Перейти к постам
+                    </a>
+                </div>
+            </div>
         {% endfor %}
     </div>
+</div>
 {% endblock %}
