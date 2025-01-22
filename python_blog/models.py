@@ -16,7 +16,7 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('category_detail', kwargs={'slug': self.slug})
+        return reverse('blog:category_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return self.name
@@ -35,6 +35,9 @@ class Tag(models.Model):
         if not self.slug:
             self.slug = slugify(unidecode(str(self.name)))
         super(Tag, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('blog:tag_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return self.name
@@ -67,7 +70,7 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("post_detail", kwargs={"slug": self.slug})
+        return reverse("blog:post_detail", kwargs={"slug": self.slug})
 
     class Meta:
         ordering = ['-published_date']  # Сортировка по дате публикации (по убыванию)
