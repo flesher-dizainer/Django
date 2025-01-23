@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from unidecode import unidecode
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название категории')
     slug = models.SlugField(max_length=250, unique=True, blank=True, verbose_name='Слаг')
@@ -25,6 +26,7 @@ class Category(models.Model):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название тега')
     slug = models.SlugField(max_length=250, unique=True, verbose_name='Слаг')
@@ -44,6 +46,7 @@ class Tag(models.Model):
         ordering = ['name']
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
 
 class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название поста')
