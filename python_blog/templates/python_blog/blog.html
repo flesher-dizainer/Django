@@ -3,83 +3,85 @@
 {% block title %}Статьи{% endblock %}
 
 {% block content %}
-<!-- Поисковая форма -->
-<div class="search-form-container mt-5">
-    <h2 class="text-center mb-4">Поиск статей</h2>
-    <form class="search-form">
-        <div class="input-group mb-3">
-            <input type="text" name="query" class="form-control" placeholder="Введите ваш поисковый запрос" aria-label="Поисковый запрос">
-            <button class="btn btn-primary" type="submit">Поиск</button>
-        </div>
-
-        <div class="form-check-container mt-3">
-            <h5>Фильтры поиска:</h5>
-            <ul class="list-unstyled">
-                <!-- Чекбоксы для выбора полей поиска -->
-                <li class="form-check">
-                    <input class="form-check-input" type="checkbox" name="category" id="category-checkbox" value="Python">
-                    <label class="form-check-label" for="category-checkbox">Категория</label>
-                </li>
-                <li class="form-check">
-                    <input class="form-check-input" type="checkbox" name="title" id="title-checkbox" value="Python">
-                    <label class="form-check-label" for="title-checkbox">Заголовок</label>
-                </li>
-                <li class="form-check">
-                    <input class="form-check-input" type="checkbox" name="text" id="text-checkbox" value="Python">
-                    <label class="form-check-label" for="text-checkbox">Текст</label>
-                </li>
-                <li class="form-check">
-                    <input class="form-check-input" type="checkbox" name="tags" id="tags-checkbox" value="Python">
-                    <label class="form-check-label" for="tags-checkbox">Теги</label>
-                </li>
-            </ul>
-        </div>
-    </form>
-</div>
-
-<div class="container">
-    <div class="blog-header mb-5">
-        <h2 class="text-center mb-4">Последние статьи</h2>
-        <div class="row g-4">
-            {% for post in posts %}
-            <div class="col-md-6 col-lg-4">
-                <article class="card h-100 post-card shadow-sm">
-                    {% if post.image %}
-                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ post.title }}</h5>
-                        <p class="card-text">{{ post.text|truncatewords:20 }}</p>
-
-                        <!-- Метки категорий и тегов -->
-                        <div class="mb-3">
-                            {% if post.category %}
-                            <span class="tag-badge bg-primary text-white me-2">{{ post.category.name }}</span>
-                            {% endif %}
-                            {% for tag in post.tags.all %}
-                            <span class="tag-badge bg-secondary text-white me-2">{{ tag.name }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Статистика и кнопка -->
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="stats text-muted">
-                                <i class="fas fa-eye"></i> {{ post.views }}
-                                <i class="fas fa-heart ms-2"></i> {{ post.likes }}
-                            </div>
-                            <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary custom-btn">
-                                Читать <i class="fas fa-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <small>{{ post.published_date|date:"d.m.Y" }}</small>
-                    </div>
-                </article>
+    <!-- Поисковая форма -->
+    <div class="search-form-container mt-5">
+        <h2 class="text-center mb-4">Поиск статей</h2>
+        <form class="search-form" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="query" class="form-control" placeholder="Введите ваш поисковый запрос"
+                       aria-label="Поисковый запрос" value="{{ request.GET.query|default:'' }}">
+                <button class="btn btn-primary" type="submit">Поиск</button>
             </div>
-            {% endfor %}
+
+            <div class="form-check-container mt-3">
+                <h5>Фильтры поиска:</h5>
+                <ul class="list-unstyled">
+                    <!-- Чекбоксы для выбора полей поиска -->
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category-checkbox"
+                        >
+                        <label class="form-check-label" for="category-checkbox">Категория</label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" name="title" id="title-checkbox">
+                        <label class="form-check-label" for="title-checkbox">Заголовок</label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" name="text" id="text-checkbox">
+                        <label class="form-check-label" for="text-checkbox">Текст</label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" name="tags" id="tags-checkbox">
+                        <label class="form-check-label" for="tags-checkbox">Теги</label>
+                    </li>
+                </ul>
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+        <div class="blog-header mb-5">
+            <h2 class="text-center mb-4">Последние статьи</h2>
+            <div class="row g-4">
+                {% for post in posts %}
+                    <div class="col-md-6 col-lg-4">
+                        <article class="card h-100 post-card shadow-sm">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.text|truncatewords:20 }}</p>
+
+                                <!-- Метки категорий и тегов -->
+                                <div class="mb-3">
+                                    {% if post.category %}
+                                        <span class="tag-badge bg-primary text-white me-2">{{ post.category.name }}</span>
+                                    {% endif %}
+                                    {% for tag in post.tags.all %}
+                                        <span class="tag-badge bg-secondary text-white me-2">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Статистика и кнопка -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="stats text-muted">
+                                        <i class="fas fa-eye"></i> {{ post.views }}
+                                        <i class="fas fa-heart ms-2"></i> {{ post.likes }}
+                                    </div>
+                                    <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary custom-btn">
+                                        Читать <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>{{ post.published_date|date:"d.m.Y" }}</small>
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
