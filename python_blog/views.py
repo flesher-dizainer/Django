@@ -16,28 +16,33 @@ def about(request):
     return render(request, 'about.html', context)
 
 
+from django.db.models import Q
+
+from django.db.models import Q
+
+
 def catalog_posts(request):
-    # post_list = Post.objects.select_related('category', 'author').prefetch_related('tags')
-    # paginator = Paginator(post_list, 10)
-    # page = request.GET.get('page')
-    # posts = paginator.get_page(page)
-    # return render(request, 'python_blog/blog.html', {'posts': posts})
-    category = request.GET.get('category')
     query = request.GET.get('query')
+    category_check = request.GET.get('category') == 'on'
+    title_check = request.GET.get('title') == 'on'
+    text_check = request.GET.get('text') == 'on'
+    tags_check = request.GET.get('tags') == 'on'
+
     if query:
-        if category:
-            posts = Post.objects.filter(
-                Q(category__name__icontains=category) |
-                Q(title__icontains=query) |
-                Q(text__icontains=query) |
-                Q(tags__name__icontains=query),
-            ).distinct()
+        queries = Q()
+        if category_check:
+            queries |= Q(category__name__icontains=query)
+        if title_check:
+            queries |= Q(title__icontains=query)
+        if text_check:
+            queries |= Q(text__icontains=query)
+        if tags_check:
+            queries |= Q(tags__name__icontains=query)
+
+        if queries:
+            posts = Post.objects.filter(queries).distinct()
         else:
-            posts = Post.objects.filter(
-                Q(title__icontains=query) |
-                Q(text__icontains=query) |
-                Q(tags__name__icontains=query),
-            ).distinct()
+            posts = Post.objects.all()
     else:
         posts = Post.objects.all()
 
@@ -47,6 +52,7 @@ def catalog_posts(request):
         'categories': categories,
     })
 
+
 def catalog_categories(request):
     categories = Category.objects.annotate(posts_count=Count('post'))
     return render(request, 'python_blog/catalog_categories.html', {'categories': categories})
@@ -55,6 +61,16 @@ def catalog_categories(request):
 def catalog_tags(request):
     tags = Tag.objects.annotate(posts_count=Count('post'))
     return render(request, 'python_blog/catalog_tags.html', {'tags': tags})
+
+
+def post_detail(request, slug):
+    # увеличиваем количество просмотров
+    Post.objects.filter(slug=slug).update(views=F('views') + 1)
+    # получаем пост
+    post = get_object_or_404(Post.objects.select_related('category', 'author')
+                             .prefetch_related('tags'), slug=slug)
+    # показываем пост
+    return render(request, 'python_blog/post_detail.html', {'post': post})
 
 
 def category_detail(request, category_slug):
@@ -75,10 +91,3 @@ def tag_detail(request, tag_slug):
     posts = paginator.get_page(page)
     return render(request, 'python_blog/tag_detail.html',
                   {'tag': tag, 'posts': posts})
-
-
-def post_detail(request, slug):
-    post = get_object_or_404(Post.objects.select_related('category', 'author')
-                             .prefetch_related('tags'), slug=slug)
-    Post.objects.filter(slug=slug).update(views=F('views') + 1)
-    return render(request, 'python_blog/post_detail.html', {'post': post})
