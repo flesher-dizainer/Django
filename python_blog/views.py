@@ -16,11 +16,6 @@ def about(request):
     return render(request, 'about.html', context)
 
 
-from django.db.models import Q
-
-from django.db.models import Q
-
-
 def catalog_posts(request):
     query = request.GET.get('query')
     category_check = request.GET.get('category') == 'on'
