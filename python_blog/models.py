@@ -57,6 +57,7 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag, blank=True, verbose_name='Теги')
     is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
     views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
+    likes = models.PositiveIntegerField(default=0, verbose_name='Лайки')
     published_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_date = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
