@@ -1,7 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Q
 from .models import Post, Category, Tag
+from .forms import PostForm
+from django.contrib.auth.decorators import login_required
 
 
 def main(request):
@@ -86,3 +88,32 @@ def tag_detail(request, tag_slug):
     posts = paginator.get_page(page)
     return render(request, 'python_blog/tag_detail.html',
                   {'tag': tag, 'posts': posts})
+
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect(post.get_absolute_url())
+    else:
+        form = PostForm()
+    return render(request, 'python_blog/post_form.html', {'form': form})
+
+
+@login_required
+def post_update(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save()
+            return redirect(post.get_absolute_url())
+    else:
+        # Предзаполняем форму текущими данными
+        initial_tags = ', '.join(tag.name for tag in post.tags.all())
+        form = PostForm(instance=post, initial={'tags': initial_tags})
+    return render(request, 'python_blog/post_form.html', {'form': form, 'post': post})
