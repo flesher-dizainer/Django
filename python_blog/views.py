@@ -39,15 +39,22 @@ def catalog_posts(request):
         if queries:
             posts = Post.objects.filter(queries).distinct()
         else:
-            posts = Post.objects.all()
+            posts = Post.objects.none()
     else:
         posts = Post.objects.all()
+    # Добавляем пагинацию
+    paginator = Paginator(posts, 6)  # 6 постов на страницу
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     categories = Category.objects.all()
-    return render(request, 'python_blog/blog.html', {
-        'posts': posts,
+    context = {
+        'posts': page_obj,
+        'page_obj': page_obj,
         'categories': categories,
-    })
+        'query': query,
+    }
+    return render(request, 'python_blog/blog.html', context)
 
 
 def catalog_categories(request):
@@ -61,12 +68,9 @@ def catalog_tags(request):
 
 
 def post_detail(request, slug):
-    # увеличиваем количество просмотров
     Post.objects.filter(slug=slug).update(views=F('views') + 1)
-    # получаем пост
     post = get_object_or_404(Post.objects.select_related('category', 'author')
                              .prefetch_related('tags'), slug=slug)
-    # показываем пост
     return render(request, 'python_blog/post_detail.html', {'post': post})
 
 
@@ -113,7 +117,6 @@ def post_update(request, slug):
             post = form.save()
             return redirect(post.get_absolute_url())
     else:
-        # Предзаполняем форму текущими данными
         initial_tags = ', '.join(tag.name for tag in post.tags.all())
         form = PostForm(instance=post, initial={'tags': initial_tags})
     return render(request, 'python_blog/post_form.html', {'form': form, 'post': post})
