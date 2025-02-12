@@ -1,15 +1,19 @@
 from django.urls import path
-from .views import *
+from .views import (
+    PostListView, PostDetailView, PostCreateView,
+    PostUpdateView, CategoryListView, CategoryDetailView,
+    TagListView, TagDetailView
+)
 
 app_name = 'blog'
 
 urlpatterns = [
-    path('', catalog_posts, name='blog'),
-    path('categories/', catalog_categories, name='catalog_categories'),
-    path('categories/<slug:category_slug>/', category_detail, name='category_detail'),
-    path('tags/', catalog_tags, name='catalog_tags'),
-    path('tags/<slug:tag_slug>/', tag_detail, name='tag_detail'),
-    path('create/', post_create, name='post_create'),
-    path('<slug:slug>/edit/', post_update, name='post_update'),
-    path('<slug:slug>/', post_detail, name='post_detail'),
+    path('', PostListView.as_view(), name='blog'),
+    path('post/create/', PostCreateView.as_view(), name='post_create'),
+    path('post/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
+    path('post/<slug:slug>/update/', PostUpdateView.as_view(), name='post_update'),
+    path('categories/', CategoryListView.as_view(), name='catalog_categories'),
+    path('categories/<slug:slug>/', CategoryDetailView.as_view(), name='category_detail'),
+    path('tags/', TagListView.as_view(), name='catalog_tags'),
+    path('tags/<slug:slug>/', TagDetailView.as_view(), name='tag_detail'),
 ]

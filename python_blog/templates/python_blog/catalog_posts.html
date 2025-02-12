@@ -3,10 +3,30 @@
 {% block title %}Каталог постов{% endblock %}
 
 {% block content %}
-    <h1>Catalog Posts</h1>
-    <ul>
+<div class="posts-container">
+    <h1 class="text-center mb-4">Все посты</h1>
+    <div class="row">
         {% for post in posts %}
-            <li><a href="{{post.get_absolute_url}}">{{ post.title }}</a></li>
+            <div class="col-md-4 mb-4">
+                <div class="post-card card h-100">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.text|truncatewords:30 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ post.get_absolute_url }}" class="btn btn-primary">Читать далее</a>
+                            <small class="text-muted">{{ post.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="text-center">Посты пока не добавлены</p>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+</div>
 {% endblock %}

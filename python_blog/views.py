@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.core.paginator import Paginator
-from django.db.models import Count, F, Q
+from django.shortcuts import render
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F, Q
+from django.urls import reverse_lazy
 from .models import Post, Category, Tag
 from .forms import PostForm
-from django.contrib.auth.decorators import login_required
-
 
 def main(request):
     return render(request, 'main.html')
@@ -17,106 +17,96 @@ def about(request):
     }
     return render(request, 'about.html', context)
 
+class PostListView(ListView):
+    model = Post
+    template_name = 'python_blog/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 6
 
-def catalog_posts(request):
-    query = request.GET.get('query')
-    category_check = request.GET.get('category') == 'on'
-    title_check = request.GET.get('title') == 'on'
-    text_check = request.GET.get('text') == 'on'
-    tags_check = request.GET.get('tags') == 'on'
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        if query:
+            queries = Q()
+            if self.request.GET.get('category') == 'on':
+                queries |= Q(category__name__icontains=query)
+            if self.request.GET.get('title') == 'on':
+                queries |= Q(title__icontains=query)
+            if self.request.GET.get('text') == 'on':
+                queries |= Q(text__icontains=query)
+            if self.request.GET.get('tags') == 'on':
+                queries |= Q(tags__name__icontains=query)
+            return Post.objects.filter(queries).distinct() if queries else Post.objects.none()
+        return Post.objects.all()
 
-    if query:
-        queries = Q()
-        if category_check:
-            queries |= Q(category__name__icontains=query)
-        if title_check:
-            queries |= Q(title__icontains=query)
-        if text_check:
-            queries |= Q(text__icontains=query)
-        if tags_check:
-            queries |= Q(tags__name__icontains=query)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('query')
+        context['categories'] = Category.objects.all()
+        return context
 
-        if queries:
-            posts = Post.objects.filter(queries).distinct()
-        else:
-            posts = Post.objects.none()
-    else:
-        posts = Post.objects.all()
-    # Добавляем пагинацию
-    paginator = Paginator(posts, 6)  # 6 постов на страницу
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'python_blog/post_detail.html'
+    context_object_name = 'post'
 
-    categories = Category.objects.all()
-    context = {
-        'posts': page_obj,
-        'page_obj': page_obj,
-        'categories': categories,
-        'query': query,
-    }
-    return render(request, 'python_blog/blog.html', context)
+    def get_object(self):
+        obj = super().get_object()
+        Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+        return obj
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['related_posts'] = Post.objects.filter(category=self.object.category).exclude(pk=self.object.pk)[:3]
+        return context
 
-def catalog_categories(request):
-    categories = Category.objects.annotate(posts_count=Count('post'))
-    return render(request, 'python_blog/catalog_categories.html', {'categories': categories})
+    def get_queryset(self):
+        return Post.objects.select_related('category', 'author').prefetch_related('tags')
 
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'python_blog/post_form.html'
+    success_url = reverse_lazy('blog:blog')
 
-def catalog_tags(request):
-    tags = Tag.objects.annotate(posts_count=Count('post'))
-    return render(request, 'python_blog/catalog_tags.html', {'tags': tags})
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'python_blog/post_form.html'
+    success_url = reverse_lazy('blog:blog')
 
-def post_detail(request, slug):
-    Post.objects.filter(slug=slug).update(views=F('views') + 1)
-    post = get_object_or_404(Post.objects.select_related('category', 'author')
-                             .prefetch_related('tags'), slug=slug)
-    return render(request, 'python_blog/post_detail.html', {'post': post})
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
 
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'python_blog/catalog_categories.html'
+    context_object_name = 'categories'
 
-def category_detail(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
-    post_list = Post.objects.filter(category=category).select_related('author')
-    paginator = Paginator(post_list, 10)
-    page = request.GET.get('page')
-    posts = paginator.get_page(page)
-    return render(request, 'python_blog/category_detail.html',
-                  {'category': category, 'posts': posts})
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'python_blog/category_detail.html'
+    context_object_name = 'category'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = Post.objects.filter(category=self.object)
+        return context
 
-def tag_detail(request, tag_slug):
-    tag = get_object_or_404(Tag, slug=tag_slug)
-    post_list = Post.objects.filter(tags=tag).select_related('author')
-    paginator = Paginator(post_list, 10)
-    page = request.GET.get('page')
-    posts = paginator.get_page(page)
-    return render(request, 'python_blog/tag_detail.html',
-                  {'tag': tag, 'posts': posts})
+class TagListView(ListView):
+    model = Tag
+    template_name = 'python_blog/catalog_tags.html'
+    context_object_name = 'tags'
 
+class TagDetailView(DetailView):
+    model = Tag
+    template_name = 'python_blog/tag_detail.html'
+    context_object_name = 'tag'
 
-@login_required
-def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect(post.get_absolute_url())
-    else:
-        form = PostForm()
-    return render(request, 'python_blog/post_form.html', {'form': form})
-
-
-@login_required
-def post_update(request, slug):
-    post = get_object_or_404(Post, slug=slug, author=request.user)
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save()
-            return redirect(post.get_absolute_url())
-    else:
-        initial_tags = ', '.join(tag.name for tag in post.tags.all())
-        form = PostForm(instance=post, initial={'tags': initial_tags})
-    return render(request, 'python_blog/post_form.html', {'form': form, 'post': post})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = Post.objects.filter(tags=self.object)
+        return context

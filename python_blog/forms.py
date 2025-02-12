@@ -1,8 +1,12 @@
 from django import forms
-from .models import Post, Tag
+from .models import Post, Tag, Category
 
 
 class PostForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = 'Выберите категорию'
+
     # Поле для ввода тегов через запятую
     tags = forms.CharField(required=False, help_text='Введите теги через запятую')
 

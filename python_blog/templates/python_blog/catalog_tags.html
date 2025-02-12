@@ -8,13 +8,19 @@
     <div class="row">
         {% for tag in tags %}
             <div class="col-md-3 mb-3">
-                <div class="tag-card">
-                    <h4>{{ tag.name }}</h4>
-                    <p class="posts-count">Постов: {{ tag.posts_count }}</p>
-                    <a href="{{ tag.get_absolute_url }}" class="btn btn-outline-primary">
-                        Смотреть посты
-                    </a>
+                <div class="tag-card card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ tag.name }}</h4>
+                        <p class="card-text">Постов: {{ tag.posts.count }}</p>
+                        <a href="{% url 'blog:tag_detail' tag.slug %}" class="btn btn-primary">
+                            Смотреть посты
+                        </a>
+                    </div>
                 </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="text-center">Теги пока не добавлены</p>
             </div>
         {% endfor %}
     </div>
