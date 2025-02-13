@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 
 from .forms import SignUpForm, LoginForm, UserUpdateForm
 
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -18,6 +19,7 @@ def signup_view(request):
     else:
         form = SignUpForm()
     return render(request, 'account_app/signup.html', {'form': form})
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -32,10 +34,8 @@ def login_view(request):
     return render(request, 'account_app/login.html', {'form': form})
 
 
-
-
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('blog:blog')
+    next_page = reverse_lazy('main')
 
     def dispatch(self, request, *args, **kwargs):
         messages.success(request, 'Вы успешно вышли из системы!')
