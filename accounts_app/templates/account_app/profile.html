@@ -14,6 +14,23 @@
             </div>
             <div class="card-body">
                 {% if user == profile_user %}
+                    <!-- API Token секция -->
+                    <div class="mb-4">
+                        <h4>API Token</h4>
+                        {% if token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{ token }}" id="tokenField" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToken()">Копировать</button>
+                            </div>
+                            <small class="text-muted">Используйте этот токен для доступа к API</small>
+                        {% else %}
+                            <form method="post" action="{% url 'accounts_app:generate_token' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Сгенерировать токен</button>
+                            </form>
+                        {% endif %}
+                    </div>
+
                     <!-- Форма редактирования -->
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
@@ -53,4 +70,13 @@
         </div>
     </div>
 </div>
+
+<script>
+function copyToken() {
+    var tokenField = document.getElementById('tokenField');
+    tokenField.select();
+    document.execCommand('copy');
+    alert('Token скопирован в буфер обмена');
+}
+</script>
 {% endblock %}

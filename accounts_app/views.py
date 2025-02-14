@@ -4,6 +4,8 @@ from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .forms import SignUpForm, LoginForm, UserUpdateForm, CustomPasswordChangeForm
 from .models import CustomUser
 
@@ -76,6 +78,10 @@ def profile_view(request, username=None):
 
     if username is None:
         profile_user = request.user
+        # Получаем токен для текущего пользователя
+        refresh = RefreshToken.for_user(request.user)
+        token = str(refresh.access_token)
+
         if request.method == 'POST':
             form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
@@ -88,14 +94,14 @@ def profile_view(request, username=None):
         return render(request, 'account_app/profile.html', {
             'form': form,
             'password_form': password_form,
-            'profile_user': profile_user
+            'profile_user': profile_user,
+            'token': token
         })
     else:
         profile_user = get_object_or_404(CustomUser, username=username)
         return render(request, 'account_app/profile.html', {
             'profile_user': profile_user
         })
-
 
 @login_required
 def change_password(request):
