@@ -1,35 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col-md-4">
-        {% if user.avatar %}
-            <img src="{{ user.avatar.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
+        {% if profile_user.avatar %}
+            <img src="{{ profile_user.avatar.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
         {% endif %}
     </div>
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h3>Profile Information</h3>
+                <h3>Профиль {% if user == profile_user %}(Мой профиль){% else %}{{ profile_user.username }}{% endif %}</h3>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            {{ field.label_tag }}
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="alert alert-danger">
-                                    {{ field.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                </form>
+                {% if user == profile_user %}
+                    <!-- Форма редактирования -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Обновить профиль</button>
+                    </form>
+
+                    <!-- Секция смены пароля -->
+                    <div class="mt-4">
+                        <h4>Сменить пароль</h4>
+                        <form method="post" action="{% url 'accounts_app:change_password' %}">
+                            {% csrf_token %}
+                            {{ password_form }}
+                            <button type="submit" class="btn btn-warning mt-3">Сменить пароль</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <!-- Просмотр профиля -->
+                    <div class="profile-info">
+                        <p><strong>Имя пользователя:</strong> {{ profile_user.username }}</p>
+                        {% if profile_user.bio %}
+                            <p><strong>О себе:</strong> {{ profile_user.bio }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
