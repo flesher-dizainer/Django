@@ -1,11 +1,38 @@
-from django.contrib.auth.views import LogoutView
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
+# from django.contrib.auth.views import LogoutView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
+from .forms import SignUpForm, LoginForm, UserUpdateForm, CustomPasswordChangeForm
+from .models import CustomUser
 
-from .forms import SignUpForm, LoginForm, UserUpdateForm
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+    LogoutView
+)
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'account_app/password_reset_form.html'
+    email_template_name = 'account_app/password_reset_email.html'
+    success_url = reverse_lazy('accounts_app:password_reset_done')
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'account_app/password_reset_done.html'
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'account_app/password_reset_confirm.html'
+    success_url = reverse_lazy('accounts_app:password_reset_complete')
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'account_app/password_reset_complete.html'
 
 
 def signup_view(request):
@@ -14,7 +41,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Registration successful!')
+            messages.success(request, 'Вы успешно зарегистрировались и вошли в систему!')
             return redirect('main')
     else:
         form = SignUpForm()
@@ -43,13 +70,43 @@ class CustomLogoutView(LogoutView):
 
 
 @login_required
-def profile_view(request):
-    if request.method == 'POST':
-        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts_app:profile')
+def profile_view(request, username=None):
+    if username and username == request.user.username:
+        return redirect('accounts_app:profile')
+
+    if username is None:
+        profile_user = request.user
+        if request.method == 'POST':
+            form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Профиль успешно обновлен!')
+                return redirect('accounts_app:profile')
+        else:
+            form = UserUpdateForm(instance=request.user)
+            password_form = CustomPasswordChangeForm(request.user)
+        return render(request, 'account_app/profile.html', {
+            'form': form,
+            'password_form': password_form,
+            'profile_user': profile_user
+        })
     else:
-        form = UserUpdateForm(instance=request.user)
-    return render(request, 'account_app/profile.html', {'form': form})
+        profile_user = get_object_or_404(CustomUser, username=username)
+        return render(request, 'account_app/profile.html', {
+            'profile_user': profile_user
+        })
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Обновляем сессию, чтобы пользователь не вылетел
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Пароль успешно изменен!')
+            return redirect('accounts_app:profile')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки.')
+    return redirect('accounts_app:profile')
